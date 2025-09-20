@@ -14,35 +14,36 @@ import matplotlib.pyplot as plt
 # print(spy.index)
 # print('\n\n\n\n')
 
-spy=(pd.read_csv("spy.csv", index_col=0, parse_dates=True['SPY'].pct_change()+1).cumprod())
-
 # df.fillna(method'fill") this fills in the missing values with the previous day's value
 
 # Data Download
-def data_download(ticker, filename):
-    data = yf.download(ticker)['Close']
+def data_download(ticker, filename, period="max", interval="1d"):
+    data = yf.download(ticker, period=period, interval=interval)['Close']
     data.to_csv(filename)
 
 # Create dictionary
-tickers={
+ticker_filname={
     "SPY": "spy.csv",
     "DX-Y.NYB": "usd.csv",
     "GC=F": "gold.csv",
-    "CL=F": "crude_oil.csv",
+    "WTI": "wti.csv",
     "ZW=F": "wheat.csv",
     "^TNX": "bonds.csv"
 }
 
 # Download data for each ticker
-for ticker, filename in ticker_filname.items():
-    data_download(ticker, filename)
+# for ticker, filename in ticker_filname.items():
+    #data_download(ticker, filename)
 
 # Sanity checks
-# Check fpr missing values
+# Check for missing values
 def check_na(data):
     null_sum=data.isna().sum()
-    null_percentage=null_sum/len(data)
-    print(f"Ratio of missing values: {null_percentage}")
+    null_percentage = null_sum/len(data)
+    print(f"Ratio of missing values: {null_percentage}\nCount of missing values: {null_sum}")
+
+spy=pd.read_csv('spy.csv', index_col=0, parse_dates=True)
+check_na(spy)
 
 # Check for missing values
 # missing_values = data.isnull().sum() # number is zero, no missing values
@@ -54,9 +55,8 @@ def check_na(data):
 #plt.yscale('log')
 
 # forex using USD index
-#usd = (yf.download("DX-Y.NYB", start=spy.index.min())['Close'].pct_change() + 1).cumprod()
-#usd.to_csv("usd_data.csv")
-#usd['DX-Y.NYB'].plot(label='USD Index')
+# usd['DX-Y.NYB'].plot(label='USD Index')
+
 
 #plt.legend()
 #plt.show()
