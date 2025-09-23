@@ -20,6 +20,11 @@ import matplotlib.pyplot as plt
 def data_download(ticker, filename, period="max", interval="1d"):
     data = yf.download(ticker, period=period, interval=interval)['Close']
     data.to_csv(filename)
+    return data
+
+data_dict={}
+print(data_dict)
+print()
 
 # Create dictionary
 ticker_filname={
@@ -30,10 +35,16 @@ ticker_filname={
     "ZW=F": "wheat.csv",
     "^TNX": "bonds.csv"
 }
+sanitized_ticker = {ticker: filename.replace('.csv', '') for ticker, filename in ticker_filname.items()}
+print('Sanitized ticker: ', sanitized_ticker)
 
 # Download data for each ticker
-# for ticker, filename in ticker_filname.items():
-    #data_download(ticker, filename)
+for ticker, filename in ticker_filname.items():
+    data_dict[ticker]=data_download(ticker, filename)
+    # print(data_dict)
+    # print()
+print(data_dict.keys())
+print()
 
 # Sanity checks
 # Check for missing values
@@ -42,7 +53,36 @@ def check_na(data):
     null_percentage = null_sum/len(data)
     print(f"Ratio of missing values: {null_percentage}\nCount of missing values: {null_sum}")
 
+# Replace in case of no values
+def fill_missing_values(df):
+    '''
+    Fill missing values using FFILL method, input is the dataframe, and ouput is the filled dataframe
+    '''
+    df=df.ffill().dropna()
+    return df
+
+def plot_df(ticker):
+    data=pd.read_csv(ticker_filname[ticker])
+    plt.figure()
+    plt.title(sanitized_ticker[ticker])
+    plt.plot(data.index,data[ticker])
+    plt.savefig(sanitized_ticker[ticker]+'.png')
+
+for ticker in ticker_filname.keys():
+    print(f"Checking {ticker}")
+    data=pd.read_csv(ticker_filname[ticker])
+    check_na(data)
+    print()
+    data=fill_missing_values(data)
+    plot_df(ticker)
+
+def plot_df(df):
+    plt.savefig()
+
 spy=pd.read_csv('spy.csv', index_col=0, parse_dates=True)
+spy=fill_missing_values(spy)
+plot_df('SPY')
+print(spy.head())
 check_na(spy)
 
 # Check for missing values
@@ -67,3 +107,4 @@ check_na(spy)
 # Write a small functions for each of the data processing steps and the one main function ton call them all
 # Streamlit dashboard
 # Create a functio that does plotting in a systematic way
+
